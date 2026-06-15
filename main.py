@@ -37,7 +37,7 @@ async def process(
     nonBlocking = str(nonBlocking).strip().lower() in {"1", "true", "yes", "on"}
     # Importing DBs
     sheet_id = "1rpfFQ2fAt4kjAl4-6qhA1lIeA933qZ5oFdzEfGXXTn0"
-    gid = ""
+    gid = "0"
     if(batch=="M.Tech"):
         gid="1752743160"
     url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv&gid={gid}"
