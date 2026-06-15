@@ -67,7 +67,10 @@ async def process(
     df = df[df['Any Active Backlog?']!="Yes"]
 
     # Removing Non-Elligible due to CGPA
-    df = df[df['CGPA (upto 2nd Semester)']>=cgpa]
+    if(batch=="B.Tech"):
+        df = df[df['CGPA (upto 6th Semester)']>=cgpa]
+    elif(batch=="B.Tech"):
+        df = df[df['CGPA (upto 2nd Semester)']>=cgpa]
 
     # For Intern
     if(offerType==0 or offerType==1):
