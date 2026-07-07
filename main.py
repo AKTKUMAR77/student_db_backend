@@ -69,7 +69,7 @@ async def process(
     # Removing Non-Elligible due to CGPA
     if(batch=="B.Tech"):
         df = df[df['CGPA (upto 6th Semester)']>=cgpa]
-    elif(batch=="B.Tech"):
+    elif(batch=="M.Tech"):
         df = df[df['CGPA (upto 2nd Semester)']>=cgpa]
 
     # For Intern
