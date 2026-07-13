@@ -7,11 +7,11 @@ from fastapi.responses import FileResponse
 
 app = FastAPI()
 
-allowed_origins = [
-    origin.strip()
-    for origin in os.getenv("FRONTEND_ORIGINS", "http://localhost:5173").split(",")
-    if origin.strip()
-]
+# allowed_origins = [
+#     origin.strip()
+#     for origin in os.getenv("FRONTEND_ORIGINS", "https://nitd2027db.vercel.app").split(",")
+#     if origin.strip()
+# ]
 
 app.add_middleware(
     CORSMiddleware,
