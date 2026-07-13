@@ -55,6 +55,7 @@ async def process(
         df = df.drop(['Nationality','Permanent Address','Unnamed: 18'],axis=1,errors="ignore")
     # Keeping Filled Out Roll Number Students and their Resume Link
 
+    df = df.drop_duplicates(subset="Roll Number")
     df = df[df['Roll Number'].isin(sd['Roll Number'])]
 
     resume_map = sd.set_index('Roll Number')['Resume Link']
