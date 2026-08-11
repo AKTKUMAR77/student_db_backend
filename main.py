@@ -1,5 +1,7 @@
 import os
-
+import re
+import requests
+import zipfile
 from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 import pandas as pd
@@ -92,3 +94,89 @@ async def process(
         media_type="text/csv",
         filename="finalDB.csv"
     )
+
+
+def extract_file_id(url):
+    match = re.search(r"/d/([a-zA-Z0-9_-]+)", url)
+
+    if match:
+        return match.group(1)
+
+    match = re.search(r"[?&]id=([a-zA-Z0-9_-]+)", url)
+
+    if match:
+        return match.group(1)
+
+    return None
+
+
+def download_resumes(df):
+    os.makedirs("resumes", exist_ok=True)
+
+    for _, row in df.iterrows():
+
+        roll_number = str(row["Roll Number"]).strip()
+        name = str(row["Name"]).strip()
+        url = str(row["Resume Link"]).strip()
+
+        file_id = extract_file_id(url)
+
+        if not file_id:
+            print(f"Invalid Google Drive URL: {url}")
+            continue
+
+        download_url = (
+            f"https://drive.usercontent.google.com/download"
+            f"?id={file_id}&export=download&confirm=t"
+        )
+
+        filename = f"{roll_number} {name}.pdf"
+        filepath = os.path.join("resumes", filename)
+
+        response = requests.get(download_url)
+
+        if response.status_code == 200:
+            with open(filepath, "wb") as f:
+                f.write(response.content)
+
+            print(f"Downloaded: {filename}")
+
+        else:
+            print(f"Failed: {filename} | Status: {response.status_code}")
+
+def create_zip():
+    zip_path = "resumes.zip"
+
+    with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zip_file:
+
+        for filename in os.listdir("resumes"):
+            filepath = os.path.join("resumes", filename)
+
+            if os.path.isfile(filepath):
+                zip_file.write(filepath, arcname=filename)
+
+    return zip_path
+
+
+@app.get("/resume")
+def resume():
+    # Fetching URL
+    # url = https://docs.google.com/spreadsheets/d/1cLOT6_uBIZ4SzQtCQuVdkIRXgkhkavWRlqlWd1-Ack4/edit?gid=1871555081#gid=1871555081
+    sheetId = "1cLOT6_uBIZ4SzQtCQuVdkIRXgkhkavWRlqlWd1-Ack4"
+    gId = "1871555081"
+    url = f"https://docs.google.com/spreadsheets/d/{sheetId}/export?format=csv&gid={gId}"
+    
+    # Fetching Dataframe
+    df = pd.read_csv(url)
+    
+    # Calling to download DF
+    download_resumes(df)
+    zip_path = create_zip()
+    return FileResponse(
+        zip_path,
+        media_type="application/zip",
+        filename="resumes.zip"
+    )
+
+    
+    
