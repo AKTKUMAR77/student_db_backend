@@ -6,6 +6,7 @@ from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 import pandas as pd
 from fastapi.responses import FileResponse
+import shutil
 
 app = FastAPI()
 
@@ -111,6 +112,10 @@ def extract_file_id(url):
 
 
 def download_resumes(df):
+    # Remove previous downloads
+    if os.path.exists("resumes"):
+        shutil.rmtree("resumes")
+        
     os.makedirs("resumes", exist_ok=True)
 
     for _, row in df.iterrows():
